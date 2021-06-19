@@ -9,12 +9,14 @@ import scrapy
 class EstatesItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    cena = scrapy.Field()  # price in EUR
     kategorija = scrapy.Field()  # house/apartment
     transakcija = scrapy.Field()  # for sale/rent
     grad = scrapy.Field()  # city
     opstina = scrapy.Field()  # community
     kvadratura = scrapy.Field()  # square footage in m^2
     godinaizgradnje = scrapy.Field()  # the year of construction
+    stanjenekretnine = scrapy.Field()  # state of the property
     povrsinazemljista = scrapy.Field()  # land area in ares
     ukupanbrojspratova = scrapy.Field()  # storeys
     spratnost = scrapy.Field()  # story
