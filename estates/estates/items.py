@@ -9,6 +9,7 @@ import scrapy
 class EstatesItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    link = scrapy.Field()  # website page number
     cena = scrapy.Field()  # price in EUR
     kategorija = scrapy.Field()  # house/apartment
     transakcija = scrapy.Field()  # for sale/rent

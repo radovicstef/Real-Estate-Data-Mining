@@ -27,10 +27,8 @@ class EstatesPipeline:
 
     def create_table(self):
         self.curr.execute(
-            """DROP TABLE IF EXISTS tbl_estates"""
-        )
-        self.curr.execute(
             """CREATE TABLE tbl_estates(
+                link longtext,
                 cena float,
                 kategorija text,
                 transakcija text,
@@ -63,9 +61,10 @@ class EstatesPipeline:
     def store_db(self, item):
         self.curr.execute(
             """INSERT INTO tbl_estates VALUES(
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )""",
             (
+                item['link'],
                 item['cena'],
                 item['kategorija'],
                 item['transakcija'],

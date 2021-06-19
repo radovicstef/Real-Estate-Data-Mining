@@ -13,7 +13,7 @@ def is_number(x):
 class EstatesSpider(scrapy.Spider):
     name = "estates"
     start_urls = [
-        'https://www.nekretnine.rs/stambeni-objekti/kuce/pantelej-nis-prizemna-kuca-184/Nk0qoX4skYe/'
+        'https://www.nekretnine.rs/stambeni-objekti/lista/po-stranici/10/'
     ]
 
     amenities_main_dict = {}
@@ -22,14 +22,25 @@ class EstatesSpider(scrapy.Spider):
     amenities_other = {}
 
     def parse(self, response):
-
         self.parse_ad(response)
+        estate_links_page = response.css("div.row.offer a").xpath("@href")
 
-        items = self.store_to_items()
-        yield items
+        next_page = response.css("a.next-article-button").xpath("@href")
+
+        for page in estate_links_page:
+            yield response.follow(page.get(), callback=self.parse_ad)
+
+        if estate_links_page:
+            yield response.follow(next_page.get(), callback=self.parse)
+
 
 
     def parse_ad(self, response):
+        self.amenities_main_dict = {}
+        self.amenities_additional = []
+        self.amenities_security = 0
+        self.amenities_other = {}  # Reset global dictionaries and arrays
+
         price = response.css("div.stickyBox__price-size h4.stickyBox__price::text").extract()[0]
         price = float("".join((price.strip(" EUR")).split()))
         location = response.css("h3.stickyBox__Location::text").extract()[0].strip()
@@ -55,6 +66,11 @@ class EstatesSpider(scrapy.Spider):
             if title == "Ostalo":
                 self.parse_amenities_other(amenities_section)
                 print(self.amenities_other)
+
+        items = self.store_to_items(response)
+        yield items
+
+
 
 
 
@@ -106,7 +122,7 @@ class EstatesSpider(scrapy.Spider):
             self.amenities_other[key] = value
 
 
-    def store_to_items(self):
+    def store_to_items(self, response):
         items = EstatesItem()
         items["kategorija"] = self.amenities_main_dict["Kategorija"] if "Kategorija" in self.amenities_main_dict else None
         items["transakcija"] = self.amenities_main_dict["Transakcija"] if "Transakcija" in self.amenities_main_dict else None
@@ -153,7 +169,11 @@ class EstatesSpider(scrapy.Spider):
 
         if any("grejanje" in amenity.lower() for amenity in self.amenities_other):
             items["tipgrejanja"] = self.amenities_other["Grejanje"]
+        else:
+            items["tipgrejanja"] = None
 
         items["sigurnost"] = self.amenities_security
+
+        items["link"] = response.request.url
         return items
 
