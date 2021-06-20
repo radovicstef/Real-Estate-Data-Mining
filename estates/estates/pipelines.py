@@ -27,6 +27,9 @@ class EstatesPipeline:
 
     def create_table(self):
         self.curr.execute(
+            """DROP TABLE IF EXISTS tbl_estates"""
+        )
+        self.curr.execute(
             """CREATE TABLE tbl_estates(
                 link longtext,
                 cena float,

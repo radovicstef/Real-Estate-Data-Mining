@@ -13,7 +13,9 @@ def is_number(x):
 class EstatesSpider(scrapy.Spider):
     name = "estates"
     start_urls = [
-        'https://www.nekretnine.rs/stambeni-objekti/lista/po-stranici/10/'
+        'https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/izdavanje/lista/po-stranici/10/',
+        'https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/lista/po-stranici/10/',
+        'https://www.nekretnine.rs/stambeni-objekti/kuce/lista/po-stranici/10/'
     ]
 
     amenities_main_dict = {}
