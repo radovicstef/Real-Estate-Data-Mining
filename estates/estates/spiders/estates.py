@@ -43,6 +43,10 @@ class EstatesSpider(scrapy.Spider):
         self.amenities_security = 0
         self.amenities_other = {}  # Reset global dictionaries and arrays
 
+        location = response.css("div.property__location ul li::text").extract()
+        if "srbija" not in (loc.lower() for loc in location):
+            return
+
         price = response.css("div.stickyBox__price-size h4.stickyBox__price::text").extract()[0]
         price = float("".join((price.strip(" EUR")).split()))
         location = response.css("h3.stickyBox__Location::text").extract()[0].strip()
