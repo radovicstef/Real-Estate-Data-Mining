@@ -1,8 +1,11 @@
 import math
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+
+def read_data(file):
+    return pd.read_csv(file)
 
 
 def keep_columns(data, columns_to_keep):  # Keep only the columns specified in columns_to_keep from data
@@ -94,7 +97,7 @@ def root_mean_squared_error(y, h):
     return np.sqrt(np.mean((y-h)**2))
 
 
-estates_data = pd.read_csv("belgrade_estates.csv")  # Read the csv file with Belgrade estates
+estates_data = read_data("belgrade_estates.csv")  # Read the csv file with Belgrade estates
 estates_data = keep_columns(estates_data, ["cena", "udaljenost_od_centra", "kvadratura", "brsoba", "spratnost"])  # Remove unnecessary columns
 estates_data = fill_nans(estates_data)  # Fill missing values
 
@@ -112,7 +115,7 @@ print(x_vector_train_normalized)
 print(y_vector_train_normalized)
 
 parameter_w_0, parameter_w_vector = gradient_descent(x_vector_train_normalized, y_vector_train_normalized)
-"""
+
 print("Provide real estate information")
 x_0 = input("Distance from center?\n")  # Distance from center
 x_1 = input("Square meters?\n")
@@ -129,7 +132,7 @@ expected_price_normalized = parameter_w_0 + parameter_w_vector[0][0]*input_data_
 expected_price = un_normalize_data(expected_price_normalized, y_vector_train)
 
 print("Expected price: {}".format(expected_price))
-"""
+
 print("Predict")
 print(x_vector_train)
 print(un_normalize_data(predict(x_vector_train_normalized), y_vector_train))
