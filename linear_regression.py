@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def read_data(file):
+def read_data(file):  # Read data from csv file
     return pd.read_csv(file)
 
 
