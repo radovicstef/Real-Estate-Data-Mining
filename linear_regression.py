@@ -26,7 +26,7 @@ def split_data(data):  # Returns train_data and test_data
     return train_data, test_data
 
 
-def format_data(data):  # Returns the x (input parameters) and y (price) vectors
+def format_data(data):  # Returns the x (input parameters) and y (price) in vector format
     x_vector = np.zeros(shape=(len(data["udaljenost_od_centra"]), 4))
     y_vector = np.zeros(shape=(len(data["udaljenost_od_centra"]), 1))
 
@@ -40,7 +40,7 @@ def format_data(data):  # Returns the x (input parameters) and y (price) vectors
     return x_vector, y_vector
 
 
-def normalize_data(data):  # Normalize the data wit min-max approach
+def normalize_data(data):  # Normalize data wit min-max approach
     normalized_data = np.copy(data)
     for i in range(0, data.shape[1]):
         minimum = np.amin(data[:, i])
@@ -49,16 +49,15 @@ def normalize_data(data):  # Normalize the data wit min-max approach
     return normalized_data
 
 
-def normalize_input_data(data_input, data):
+def normalize_input_data(data_input, data):  # Normalize first parameter data, based on second parameter which contains un-normalized data
     for i in range(0, data.shape[1]):
         minimum = np.amin(data[:, i])
         maximum = np.amax(data[:, i])
         data_input[i] = (data_input[i] - minimum) / (maximum - minimum)
-        print(data_input)
     return data_input
 
 
-def un_normalize_data(data_normalized, data):
+def un_normalize_data(data_normalized, data):  # Un-normalize first parameter data, based on second parameter which contains un-normalized data
     for i in range(0, data.shape[1]):
         minimum = np.amin(data[:, i])
         maximum = np.amax(data[:, i])
@@ -66,13 +65,10 @@ def un_normalize_data(data_normalized, data):
     return un_normalized_data
 
 
-def gradient_descent(x_vector, y_vector, num_iterations=1000, learning_rate=0.1):
+def gradient_descent(x_vector, y_vector, num_iterations=1000, learning_rate=0.1):  # Gradient descent algorithm
     w_0 = 0.0
-    w_vector = np.zeros((1, x_vector.shape[1]))
-    m = x_vector.shape[0]  # m is data size
-    print(w_vector)
-    print(w_vector.shape[0])
-    print(w_vector.shape[1])
+    w_vector = np.zeros((1, x_vector.shape[1]))  # Initial parameters are equal to 0
+    m = x_vector.shape[0]  # m is dataset size
     for i in range(0, num_iterations):
         h = np.dot(x_vector, w_vector.T) + w_0
 
@@ -81,68 +77,60 @@ def gradient_descent(x_vector, y_vector, num_iterations=1000, learning_rate=0.1)
 
         w_0 = temp_w_0
         w_vector = temp_w_vector
-
-    print(w_0)
-    print(w_vector)
-
     return w_0, w_vector
 
 
-def predict(x_vector):
+def predict(x_vector):  # Based on already calculated parameters, returns the predicted value
     global parameter_w_0, parameter_w_vector
     return parameter_w_0 + np.dot(x_vector, parameter_w_vector.T)
 
 
-def root_mean_squared_error(y, h):
+def root_mean_squared_error(y, h):  # Calculates RMSE
     return np.sqrt(np.mean((y-h)**2))
 
 
-estates_data = read_data("belgrade_estates.csv")  # Read the csv file with Belgrade estates
-estates_data = keep_columns(estates_data, ["cena", "udaljenost_od_centra", "kvadratura", "brsoba", "spratnost"])  # Remove unnecessary columns
-estates_data = fill_nans(estates_data)  # Fill missing values
+if __name__ == "__main__":
+    estates_data = read_data("belgrade_estates.csv")  # Read the csv file with Belgrade estates
+    estates_data = keep_columns(estates_data, ["cena", "udaljenost_od_centra", "kvadratura", "brsoba", "spratnost"])  # Remove unnecessary columns
+    estates_data = fill_nans(estates_data)  # Fill missing values
 
-estates_data_train, estates_data_test = split_data(estates_data)  # Split the dataset
+    estates_data_train, estates_data_test = split_data(estates_data)  # Split the dataset
 
-x_vector_train, y_vector_train = format_data(estates_data_train)
-x_vector_test, y_vector_test = format_data(estates_data_test)
+    # Format test and train dataframe into vectors
+    x_vector_train, y_vector_train = format_data(estates_data_train)
+    x_vector_test, y_vector_test = format_data(estates_data_test)
 
-x_vector_train_normalized = normalize_data(x_vector_train)
-y_vector_train_normalized = normalize_data(y_vector_train)
-x_vector_test_normalized = normalize_data(x_vector_test)
-y_vector_test_normalized = normalize_data(y_vector_test)
+    # Normalize data [0, 1]
+    x_vector_train_normalized = normalize_data(x_vector_train)
+    y_vector_train_normalized = normalize_data(y_vector_train)
+    x_vector_test_normalized = normalize_data(x_vector_test)
+    y_vector_test_normalized = normalize_data(y_vector_test)
 
-print(x_vector_train_normalized)
-print(y_vector_train_normalized)
+    # Gradient descent method returns parameters value
+    parameter_w_0, parameter_w_vector = gradient_descent(x_vector_train_normalized, y_vector_train_normalized)
+    print("Calculated parameters:\n w_0 = {}, w_vector = {}".format(parameter_w_0, parameter_w_vector))
 
-parameter_w_0, parameter_w_vector = gradient_descent(x_vector_train_normalized, y_vector_train_normalized)
+    # predicted_data_train = un_normalize_data(predict(x_vector_train_normalized), y_vector_train)
+    # predicted_data_test = un_normalize_data(predict(x_vector_test_normalized), y_vector_test)
+    # print("RMSE = {}".format(root_mean_squared_error(y_vector_train, predicted_data_train)))
+    # print("RMSE = {}".format(root_mean_squared_error(y_vector_test, predicted_data_test)))
 
-print("Provide real estate information")
-x_0 = input("Distance from center?\n")  # Distance from center
-x_1 = input("Square meters?\n")
-x_2 = input("Number of rooms?\n")
-x_3 = input("Number of storey?\n")
+    print("Provide real estate information")
+    x_0 = input("Distance from center in km?\n")
+    x_1 = input("Area in square meters?\n")
+    x_2 = input("Number of rooms?\n")
+    x_3 = input("Floor?\n")
 
-input_data = [float(x_0), float(x_1), float(x_2), float(x_3)]
-input_data_normalized = normalize_input_data(input_data, x_vector_train)
+    input_data = [float(x_0), float(x_1), float(x_2), float(x_3)]  # Format input data as vector
+    input_data_normalized = normalize_input_data(input_data, x_vector_train)  # Normalize input data
 
-print("Input data normalized")
-print(input_data_normalized)
+    # Calculate expected price
+    expected_price_normalized = parameter_w_0 + parameter_w_vector[0][0] * input_data_normalized[0] + parameter_w_vector[0][1] * input_data_normalized[1] + parameter_w_vector[0][2] * input_data_normalized[2] + parameter_w_vector[0][3] * input_data_normalized[3]
+    expected_price = un_normalize_data(expected_price_normalized, y_vector_train)
 
-expected_price_normalized = parameter_w_0 + parameter_w_vector[0][0]*input_data_normalized[0] + parameter_w_vector[0][1]*input_data_normalized[1] + parameter_w_vector[0][2]*input_data_normalized[2] + parameter_w_vector[0][3]*input_data_normalized[3]
-expected_price = un_normalize_data(expected_price_normalized, y_vector_train)
+    print("Expected price: {}€".format(expected_price))
 
-print("Expected price: {}".format(expected_price))
 
-print("Predict")
-print(x_vector_train)
-print(un_normalize_data(predict(x_vector_train_normalized), y_vector_train))
-                        # predict the normalized price, with normalized x_vector and w_parameters
-        #un_normalize price
-
-predicted_data_train = un_normalize_data(predict(x_vector_train_normalized), y_vector_train)
-predicted_data_test = un_normalize_data(predict(x_vector_test_normalized), y_vector_test)
-print(root_mean_squared_error(y_vector_train, predicted_data_train))
-print(root_mean_squared_error(y_vector_test, predicted_data_test))
 
 
 
