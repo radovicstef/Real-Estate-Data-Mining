@@ -77,7 +77,7 @@ def determine_distance(data_input, data, distance_type):  # Calculate distance b
     distances = []
     if distance_type == 1:  # Euclidean distance
         for i in range(0, data.shape[0]):
-            distance = sum((euclidean_distance(x, _x) for x, _x in zip(data_input, data[i][:])))
+            distance = math.sqrt(sum((euclidean_distance(x, _x) for x, _x in zip(data_input, data[i][:]))))
             distances.append(distance)
     else:  # Manhattan distance
         for i in range(0, data.shape[0]):
@@ -87,7 +87,7 @@ def determine_distance(data_input, data, distance_type):  # Calculate distance b
 
 
 def euclidean_distance(x, _x):
-    return math.sqrt((x - _x) ** 2)
+    return (x - _x) ** 2
 
 
 def manhattan_distance(x, _x):
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     distances_and_classes = list(zip(calculated_distances, y_classified))  # Zip calculated distances with appropriate prices
 
     distances_and_classes.sort(key=lambda x: x[0])  # Sort (distance, class) by distance
-    print("Distances and classes: {}".format(distances_and_classes))
+    #print("Distances and classes: {}".format(distances_and_classes))
 
     predicted_class_index = determine_class(distances_and_classes, k)  # Determine predicted price class
 
